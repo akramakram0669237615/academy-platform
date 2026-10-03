@@ -1,0 +1,22 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    env_file: .env
+    depends_on:
+      - postgres
+    volumes:
+      - ./storage:/var/www/html/storage
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: academybuilder
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
