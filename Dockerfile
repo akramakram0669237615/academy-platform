@@ -7,12 +7,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/000-default.conf \
+    /etc/apache2/apache2.conf
 
 WORKDIR /var/www/html
+
 COPY . /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html/storage \
+RUN mkdir -p /var/www/html/storage \
+    && chown -R www-data:www-data /var/www/html/storage \
     && chmod -R 775 /var/www/html/storage
 
 EXPOSE 80
