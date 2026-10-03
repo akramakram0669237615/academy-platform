@@ -3,7 +3,7 @@ FROM php:8.3-apache
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql \
-    && a2enmod rewrite headers expires \
+    && a2enmod headers expires \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www/html
@@ -18,9 +18,10 @@ RUN printf '%s\n' \
     '<VirtualHost *:80>' \
     '    DocumentRoot /var/www/html/public' \
     '    <Directory /var/www/html/public>' \
-    '        AllowOverride All' \
+    '        AllowOverride None' \
     '        Require all granted' \
     '        DirectoryIndex index.php index.html' \
+    '        FallbackResource /index.php' \
     '    </Directory>' \
     '    ErrorLog ${APACHE_LOG_DIR}/error.log' \
     '    CustomLog ${APACHE_LOG_DIR}/access.log combined' \
