@@ -6,12 +6,6 @@ RUN apt-get update \
     && a2enmod rewrite headers expires \
     && rm -rf /var/lib/apt/lists/*
 
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/000-default.conf \
-    /etc/apache2/apache2.conf
-
 WORKDIR /var/www/html
 
 COPY . /var/www/html
@@ -19,5 +13,18 @@ COPY . /var/www/html
 RUN mkdir -p /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/storage \
     && chmod -R 775 /var/www/html/storage
+
+RUN printf '%s\n' \
+    '<VirtualHost *:80>' \
+    '    DocumentRoot /var/www/html/public' \
+    '    <Directory /var/www/html/public>' \
+    '        AllowOverride All' \
+    '        Require all granted' \
+    '        DirectoryIndex index.php index.html' \
+    '    </Directory>' \
+    '    ErrorLog ${APACHE_LOG_DIR}/error.log' \
+    '    CustomLog ${APACHE_LOG_DIR}/access.log combined' \
+    '</VirtualHost>' \
+    > /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
